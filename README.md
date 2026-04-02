@@ -116,4 +116,6 @@ MonetaryValue = AOV × Frequency is an algebraic identity introducing feature re
 
 ---
 
-The code includes descriptive markdown cells throughout, and every decision is justified visually, statistically, and from a business perspective.
+**Notes**
+- The purpose of this code is to explicitly demonstrate the reasoning behind every choice balanced between statistics and business interpretability without deleting post-hoc known facts (for example tenure is preserved initally then dropped instead of not being included in the first place)
+- The code includes descriptive markdown cells throughout, and every decision is justified visually, statistically, and from a business perspective.
