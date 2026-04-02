@@ -44,7 +44,7 @@ Outliers are identified per feature using the IQR method (1.5× fence) on Moneta
 
 ## Transformation and Dimensionality Reduction
 
-All features are heavily right-skewed, confirmed by D'Agostino-Pearson normality tests (p ≈ 0 for all). Yeo-Johnson power transformation is applied to normalize distributions. A secondary robust Z-score check (using median and MAD) confirms that remaining post-transformation outliers are negligible in both count and impact.
+All features are heavily right-skewed, confirmed by skewness/kurtosis descriptive stats and visualizations. Yeo-Johnson power transformation is applied to normalize distributions. A secondary robust Z-score check (using median and MAD) confirms that remaining post-transformation outliers are negligible in both count and impact.
 
 PCA reduces the four transformed features to three components explaining ~99.8% of variance, decorrelating the high multicollinearity between MonetaryValue and Frequency (r=0.85) before clustering.
 
@@ -52,18 +52,20 @@ PCA reduces the four transformed features to three components explaining ~99.8% 
 
 ## Clustering
 
-KMeans is evaluated for k=2 through k=8 using inertia, global silhouette score, Davies-Bouldin index, Calinski-Harabasz score, and per-cluster silhouette distributions visualized as boxplots for each k.
+KMeans is evaluated for k=2 through k=8 using inertia, global silhouette score, Davies-Bouldin index, and per-cluster silhouette distributions visualized as boxplots for each k.
 
 No single metric unanimously agrees on an optimal k, so the final choice integrates statistical evidence with business interpretability.
 
 k=5 is selected. It wins two of three metrics against k=4 (Davies-Bouldin and Silhouette), and k=4 is further ruled out because it merges At-Risk High-Value and At-Risk Frequent into a single segment — two groups that differ critically in AOV (£426 vs £216) and require entirely different marketing strategies. Convergence is confirmed at 14 iterations; max_iter=50 is retained 
 as a safety margin.
 
+GMM was evaluated across all four covariance types (spherical, tied, diag, full) for k=2–8 on pre-PCA transformed features — PCA was intentionally skipped for GMM, as it destroys the elliptical correlation structure GMM is designed to exploit. KMeans narrowly wins silhouette (0.301 vs 0.280); GMM wins Davies-Bouldin (1.000 vs 1.057), but the margin is negligible. Spherical GMM performing best reinforces that the RFM feature space, after Yeo-Johnson, is compact enough for spherical assumptions — meaning KMeans' assumption holds and GMM's elliptical flexibility adds no practical benefit. KMeans is also preferred for producing hard, actionable labels suited to the marketing use case.
+
 ---
 
 ## Segments
 
-**VIP** (2,060 customers) — £6,965 avg spend, 13.4 orders, 51 days recency. Accounts for 84.1% of total revenue. 722 of these customers are statistical outliers, likely wholesale or B2B buyers. Loyalty programs, early access, and dedicated account managers for the outlier sub-group.
+**VIP** (2,060 customers) — £6,965 avg spend, 13.4 orders, 51 days recency. Accounts for 84.1% of total revenue. 722 of these customers are statistical outliers, likely wholesale or B2B buyers — generating 64.8% of total revenue alone vs 19.3% for the core VIP segment. Loyalty programs, early access, and dedicated account managers for the outlier sub-group.
 
 **Loyal** (855 customers) — £521 avg spend, 2.7 orders, 31 days recency. Most recently active segment after VIP. Cross-sell and upsell to migrate toward VIP.
 
@@ -77,7 +79,8 @@ as a safety margin.
 
 ## Model Validation
 
-Temporal consistency is verified by splitting the dataset at December 2010 and computing segment distributions independently on each half — no segment shifts by more than 1.6 percentage points. Cluster stability is confirmed via Adjusted Rand Index across four random seeds (ARI ≥ 0.99). Statistical separation between clusters is confirmed by Kruskal-Wallis tests (p ≈ 0 for all four features). An end-to-end inference demo validates that seven synthetic customers with known profiles each land in the correct segment.
+Temporal consistency is verified by splitting the dataset at December 2010 and computing segment distributions independently on each half — no segment shifts by more than 1.6 percentage points. Cluster stability is confirmed via Adjusted Rand Index across four random seeds (ARI ≥ 0.99). Bootstrap stability is confirmed across 100 resampled iterations (mean ARI: 0.857 ± 0.082).  Statistical separation between clusters is confirmed by Kruskal-Wallis tests (p ≈ 0 for all four features). An end-to-end inference demo validates that seven synthetic customers with known profiles each land in the correct segment.
+
 
 ---
 
@@ -90,6 +93,7 @@ Temporal consistency is verified by splitting the dataset at December 2010 and c
 - `artifacts/pca.pkl` — fitted PCA (3 components)
 - `artifacts/iqr_bounds.pkl` — outlier detection bounds
 - `artifacts/reference_date.pkl` — training reference date
+- `artifacts/cluster_labels_names.pkl` — cluster index to segment name mapping
 
 All artifacts enable end-to-end inference on new customers without retraining.
 
