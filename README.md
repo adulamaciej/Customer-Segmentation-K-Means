@@ -1,6 +1,6 @@
 # Data Science project: Customer Segmentation — Online Retail II
 
-RFM-based customer segmentation using KMeans clustering on the UCI Online Retail II dataset (2009–2011, ~1M transactions). This project segments ~5,850 customers into five actionable groups to enable targeted marketing strategies.
+RFM-based customer segmentation using KMeans clustering on the UCI Online Retail II dataset (2009–2011, ~1M transactions). This project segments ~5,850 customers into five actionable groups to enable targeted marketing strategies and recommendations - dashboard in Power BI
 
 ---
 
@@ -96,6 +96,16 @@ Temporal consistency is verified by splitting the dataset at December 2010 and c
 - `artifacts/cluster_labels_names.pkl` — cluster index to segment name mapping
 
 All artifacts enable end-to-end inference on new customers without retraining.
+
+---
+
+## Power BI Dashboard
+
+![Customer Segmentation Dashboard](dashboard/dashboard_screenshot.png)
+
+Interaktywny dashboard w Power BI prezentujący segmentację klientów: rozkład liczebności segmentów, udział w przychodzie oraz kluczowe metryki (Recency, Frequency, Monetary, AOV) per segment.
+
+Pełna wersja: [dashboard.pdf](dashboard/dashboard.pdf)
 
 ---
 
