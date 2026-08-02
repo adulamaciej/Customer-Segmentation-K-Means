@@ -99,7 +99,7 @@ All artifacts enable end-to-end inference on new customers without retraining.
 
 ![Customer Segmentation Dashboard](dashboard/dashboard_screenshot.png)
 
-Interactive Power BI dashboard presenting the customer segmentation: segment size distribution, revenue share, and key metrics (Recency, Frequency, Monetary, AOV) per segment.
+Interactive Power BI dashboard presenting the customer segmentation: segment size distribution, revenue share, and key metrics (Recency, Frequency, Monetary, AOV) per segment with recommendations for each segment.
 
 Full version: [dashboard.pdf](dashboard/dashboard.pdf)
 
