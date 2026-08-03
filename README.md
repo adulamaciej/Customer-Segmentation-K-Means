@@ -65,13 +65,28 @@ as a safety margin.
 
 **VIP** (2,060 customers) — £6,965 avg spend, 13.4 orders, 51 days recency. Accounts for 84.1% of total revenue. 722 of these customers are statistical outliers, likely wholesale or B2B buyers. Loyalty programs, early access, and dedicated account managers for the outlier sub-group.
 
-**Loyal** (855 customers) — £521 avg spend, 2.7 orders, 31 days recency. Most recently active segment after VIP. Cross-sell and upsell to migrate toward VIP.
+**Promising** (855 customers) — £521 avg spend, 2.7 orders, 31 days recency. Most recently active segment after VIP. Cross-sell and upsell to migrate toward VIP.
 
 **At-Risk High-Value** (1,074 customers) — £1,252 avg spend, 1.5 orders, 338 days recency, highest AOV at £740. They spend big when they buy but are now disengaged. Personalized win-back campaigns before full churn.
 
 **At-Risk Frequent** (839 customers) — £909 avg spend, 4.4 orders, 299 days recency. Were regular buyers now disengaged. Bundle deals and volume incentives to reactivate purchase habits.
 
 **Churned** (1,024 customers) — £165 avg spend, 1.3 orders, 410 days recency. Lowest value segment. Low-cost automated email only; deprioritize after 2–3 attempts with no response.
+
+---
+
+## Estimated Business Impact
+
+Illustrative win-back revenue potential: customers × industry-benchmark reactivation rate × AOV (value of one recovered order).
+
+| Segment | Customers | AOV | Low | Mid | High |
+|---|---|---|---|---|---|
+| At-Risk High-Value | 1,074 | £740 | £39.7k | £79.5k | £119.2k |
+| At-Risk Frequent | 839 | £207 | £8.7k | £17.4k | £26.1k |
+| Churned | 1,024 | £127 | £2.6k | £4.6k | £6.5k |
+| **Total (mid-case)** | | | | **~£101k** | |
+
+Assumptions: rates are illustrative industry benchmarks, not fitted to this data.
 
 ---
 
