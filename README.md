@@ -44,7 +44,7 @@ Outliers are identified per feature using the IQR method (1.5× fence) on Moneta
 
 ## Transformation and Dimensionality Reduction
 
-All features are heavily right-skewed, confirmed by D'Agostino-Pearson normality tests (p ≈ 0 for all). Yeo-Johnson power transformation is applied to normalize distributions. A secondary robust Z-score check (using median and MAD) confirms that remaining post-transformation outliers are negligible in both count and impact.
+All features are heavily right-skewed, confirmed by descriptive skew/kurtosis coefficients and Q-Q plots (formal tests skipped — unreliable at n>4000). Yeo-Johnson power transformation is applied to normalize distributions. A secondary robust Z-score check (using median and MAD) confirms that remaining post-transformation outliers are negligible in both count and impact.
 
 PCA reduces the four transformed features to three components explaining ~99.8% of variance, decorrelating the high multicollinearity between MonetaryValue and Frequency (r=0.85) before clustering.
 
@@ -52,11 +52,11 @@ PCA reduces the four transformed features to three components explaining ~99.8% 
 
 ## Clustering
 
-KMeans is evaluated for k=2 through k=8 using inertia, global silhouette score, Davies-Bouldin index, Calinski-Harabasz score, and per-cluster silhouette distributions visualized as boxplots for each k.
+KMeans is evaluated for k=2 through k=8 using global silhouette score, Davies-Bouldin index, and per-cluster silhouette distributions visualized as boxplots.
 
 No single metric unanimously agrees on an optimal k, so the final choice integrates statistical evidence with business interpretability.
 
-k=5 is selected. It wins two of three metrics against k=4 (Davies-Bouldin and Silhouette), and k=4 is further ruled out because it merges At-Risk High-Value and At-Risk Frequent into a single segment — two groups that differ critically in AOV (£426 vs £216) and require entirely different marketing strategies. Convergence is confirmed at 14 iterations; max_iter=50 is retained 
+k=5 is selected. It wins two of three metrics against k=4 (Davies-Bouldin and Silhouette), and k=4 is further ruled out because it merges At-Risk High-Value and At-Risk Frequent into a single segment — two groups that differ critically in AOV (£426 vs £216 on non-outlier training data) and require entirely different marketing strategies. Convergence is confirmed at 14 iterations; max_iter=50 is retained 
 as a safety margin.
 
 ---
@@ -77,7 +77,7 @@ as a safety margin.
 
 ## Model Validation
 
-Temporal consistency is verified by splitting the dataset at December 2010 and computing segment distributions independently on each half — no segment shifts by more than 1.6 percentage points. Cluster stability is confirmed via Adjusted Rand Index across four random seeds (ARI ≥ 0.99). Statistical separation between clusters is confirmed by Kruskal-Wallis tests (p ≈ 0 for all four features). An end-to-end inference demo validates that seven synthetic customers with known profiles each land in the correct segment.
+Distributional stability is verified by splitting the dataset at December 2010 and applying the already-trained pipeline to each half independently — segment proportions shift by no more than 1.6 percentage points. Cluster stability is confirmed via Adjusted Rand Index across four random seeds (ARI ≥ 0.99). Statistical separation between clusters is confirmed by Kruskal-Wallis tests (p ≈ 0 for all four features). An end-to-end inference demo validates that seven synthetic customers with known profiles each land in the correct segment.
 
 ---
 
