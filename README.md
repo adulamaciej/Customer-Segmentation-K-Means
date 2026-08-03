@@ -4,6 +4,27 @@ RFM-based customer segmentation using KMeans clustering on the UCI Online Retail
 
 ---
 
+## Project Structure
+
+```
+src/            # modular pipeline (cleaning, features, outliers, transform,
+                # clustering, business_impact, inference)
+tests/          # pytest unit tests for each module
+notebooks/      # clustering.ipynb — full EDA, statistical reasoning, and
+                # business narrative (the primary artifact)
+```
+
+---
+
+## Development
+
+```bash
+python3 -m pip install -r requirements.txt
+python3 -m pytest tests/ -v
+```
+
+---
+
 ## Pipeline
 
 ```
@@ -144,7 +165,7 @@ MonetaryValue = AOV × Frequency is an algebraic identity introducing feature re
 
 ## Stack
 
-`pandas` · `numpy` · `scikit-learn` · `seaborn` · `matplotlib` · `scipy` · `pandera` · `joblib`
+`pandas` · `numpy` · `scikit-learn` · `seaborn` · `matplotlib` · `scipy` · `pandera` · `joblib`, `pytest`
 
 ---
 
