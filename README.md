@@ -1,6 +1,6 @@
 # Data Science project: Customer Segmentation — Online Retail II
 
-RFM-based customer segmentation using KMeans clustering on the UCI Online Retail II dataset (2009–2011, ~1M transactions). This project segments ~5,850 customers into five actionable groups to enable targeted marketing strategies and recommendations - dashboard in Power BI
+RFM-based customer segmentation using KMeans clustering (benchmarked against GMM) on the UCI Online Retail II dataset (2009–2011, ~1M transactions). Segments ~5,850 customers into five actionable groups with tailored marketing recommendations, a potential revenue opportunity (win-back + upsell), and a baseline comparison confirming clustering outperforms simple RFM quintile scoring — dashboard in Power BI.
 
 ---
 
@@ -79,6 +79,14 @@ No single metric unanimously agrees on an optimal k, so the final choice integra
 
 k=5 is selected. It wins two of three metrics against k=4 (Davies-Bouldin and Silhouette), and k=4 is further ruled out because it merges At-Risk High-Value and At-Risk Frequent into a single segment — two groups that differ critically in AOV (£426 vs £216 on non-outlier training data) and require entirely different marketing strategies. Convergence is confirmed at 14 iterations; max_iter=50 is retained 
 as a safety margin.
+
+---
+
+## Baseline Comparison
+
+A naive R+F+M quintile-sum baseline (5 equal-sized buckets, same K as KMeans) was tested to confirm clustering adds value over simple rule-based scoring. KMeans outperforms it on silhouette (0.301 vs 0.115) and Davies-Bouldin (1.057 vs 2.538), though this partly reflects that KMeans directly optimizes this objective — a standard comparison in RFM-vs-clustering literature, but directionally biased in KMeans' favor.
+
+The stronger case is structural: the baseline's AOV increases only mildly and monotonically across its buckets (£202 → £319), never distinguishing high-AOV/low-frequency customers from low-AOV/high-frequency ones, since summing R+F+M collapses these into the same score. KMeans separates At-Risk High-Value (AOV £740) from At-Risk Frequent (AOV £207) despite similar overall RFM standing — a distinction quintile summing cannot make by construction.
 
 ---
 
