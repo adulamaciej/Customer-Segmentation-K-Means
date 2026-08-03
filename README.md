@@ -88,6 +88,17 @@ Illustrative win-back revenue potential: customers × industry-benchmark reactiv
 
 Assumptions: rates are illustrative industry benchmarks, not fitted to this data.
 
+
+Illustrative upsell revenue potential: customers migrating from Promising-level spend (£521) to VIP-core-level spend (£2,461) — a different mechanism than win-back, using more conservative migration rates (3–12%) than typical single-purchase upsell benchmarks (10–25%).
+
+| Segment | Customers | Δ Spend | Low | Mid | High |
+|---|---|---|---|---|---|
+| Promising → VIP | 855 | £1,940 | £49.8k | £116.1k | £199.0k |
+
+*Δ Spend based on VIP core avg spend (£2,461, excluding whale outliers), not the £6,965 blended VIP average shown above.
+
+**Combined estimated impact (mid-case): ~£217k**
+
 ---
 
 ## Model Validation
