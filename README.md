@@ -1,6 +1,27 @@
 # Data Science project: Customer Segmentation — Online Retail II
 
-RFM-based customer segmentation using KMeans clustering on the UCI Online Retail II dataset (2009–2011, ~1M transactions). This project segments ~5,850 customers into five actionable groups to enable targeted marketing strategies and recommendations - dashboard in Power BI
+RFM-based customer segmentation using KMeans clustering (benchmarked against GMM) on the UCI Online Retail II dataset (2009–2011, ~1M transactions). Segments ~5,850 customers into five actionable groups with tailored marketing recommendations, a potential revenue opportunity (win-back + upsell), and a baseline comparison confirming clustering outperforms simple RFM quintile scoring — dashboard in Power BI.
+
+---
+
+## Project Structure
+
+```
+src/            # modular pipeline (cleaning, features, outliers, transform,
+                # clustering, business_impact, inference)
+tests/          # pytest unit tests for each module
+notebooks/      # clustering.ipynb — full EDA, statistical reasoning, and
+                # business narrative (the primary artifact)
+```
+
+---
+
+## Development
+
+```bash
+python3 -m pip install -r requirements.txt
+python3 -m pytest tests/ -v
+```
 
 ---
 
@@ -44,7 +65,7 @@ Outliers are identified per feature using the IQR method (1.5× fence) on Moneta
 
 ## Transformation and Dimensionality Reduction
 
-All features are heavily right-skewed, confirmed by skewness/kurtosis descriptive stats and visualizations. Yeo-Johnson power transformation is applied to normalize distributions. A secondary robust Z-score check (using median and MAD) confirms that remaining post-transformation outliers are negligible in both count and impact.
+All features are heavily right-skewed, confirmed by descriptive skew/kurtosis coefficients and Q-Q plots (formal tests skipped — unreliable at n>4000). Yeo-Johnson power transformation is applied to normalize distributions. A secondary robust Z-score check (using median and MAD) confirms that remaining post-transformation outliers are negligible in both count and impact.
 
 PCA reduces the four transformed features to three components explaining ~99.8% of variance, decorrelating the high multicollinearity between MonetaryValue and Frequency (r=0.85) before clustering.
 
@@ -52,22 +73,34 @@ PCA reduces the four transformed features to three components explaining ~99.8% 
 
 ## Clustering
 
-KMeans is evaluated for k=2 through k=8 using inertia, global silhouette score, Davies-Bouldin index, and per-cluster silhouette distributions visualized as boxplots for each k.
+KMeans is evaluated for k=2 through k=8 using global silhouette score, Davies-Bouldin index, and per-cluster silhouette distributions visualized as boxplots.
 
 No single metric unanimously agrees on an optimal k, so the final choice integrates statistical evidence with business interpretability.
 
-k=5 is selected. It wins two of three metrics against k=4 (Davies-Bouldin and Silhouette), and k=4 is further ruled out because it merges At-Risk High-Value and At-Risk Frequent into a single segment — two groups that differ critically in AOV (£426 vs £216) and require entirely different marketing strategies. Convergence is confirmed at 14 iterations; max_iter=50 is retained 
+k=5 is selected. It wins two of three metrics against k=4 (Davies-Bouldin and Silhouette), and k=4 is further ruled out because it merges At-Risk High-Value and At-Risk Frequent into a single segment — two groups that differ critically in AOV (£426 vs £216 on non-outlier training data) and require entirely different marketing strategies. Convergence is confirmed at 14 iterations; max_iter=50 is retained 
 as a safety margin.
 
-GMM was evaluated across all four covariance types (spherical, tied, diag, full) for k=2–8 on pre-PCA transformed features — PCA was intentionally skipped for GMM, as it destroys the elliptical correlation structure GMM is designed to exploit. KMeans narrowly wins silhouette (0.301 vs 0.280); GMM wins Davies-Bouldin (1.000 vs 1.057), but the margin is negligible. Spherical GMM performing best reinforces that the RFM feature space, after Yeo-Johnson, is compact enough for spherical assumptions — meaning KMeans' assumption holds and GMM's elliptical flexibility adds no practical benefit. KMeans is also preferred for producing hard, actionable labels suited to the marketing use case.
+GMM was tested as an alternative to KMeans on both raw transformed features 
+(silhouette 0.28, DB 1.00) and PCA-reduced input (silhouette 0.27, DB 1.01) — 
+nearly identical either way, confirming GMM's near-tie with KMeans (silhouette 
+0.301, DB 1.057) holds regardless of feature space. KMeans is retained for its 
+cleaner hard-label output, better suited to the marketing use case.
+
+---
+
+## Baseline Comparison
+
+A naive R+F+M quintile-sum baseline (5 equal-sized buckets, same K as KMeans) was tested to confirm clustering adds value over simple rule-based scoring. KMeans outperforms it on silhouette (0.301 vs 0.115) and Davies-Bouldin (1.057 vs 2.538), though this partly reflects that KMeans directly optimizes this objective — a standard comparison in RFM-vs-clustering literature, but directionally biased in KMeans' favor.
+
+The stronger case is structural: the baseline's AOV increases only mildly and monotonically across its buckets (£202 → £319), never distinguishing high-AOV/low-frequency customers from low-AOV/high-frequency ones, since summing R+F+M collapses these into the same score. KMeans separates At-Risk High-Value (AOV £740) from At-Risk Frequent (AOV £207) despite similar overall RFM standing — a distinction quintile summing cannot make by construction.
 
 ---
 
 ## Segments
 
-**VIP** (2,060 customers) — £6,965 avg spend, 13.4 orders, 51 days recency. Accounts for 84.1% of total revenue. 722 of these customers are statistical outliers, likely wholesale or B2B buyers — generating 64.8% of total revenue alone vs 19.3% for the core VIP segment. Loyalty programs, early access, and dedicated account managers for the outlier sub-group.
+**VIP** (2,060 customers) — £6,965 avg spend, 13.4 orders, 51 days recency. Accounts for 84.1% of total revenue. 722 of these customers are statistical outliers, likely wholesale or B2B buyers. Loyalty programs, early access, and dedicated account managers for the outlier sub-group.
 
-**Loyal** (855 customers) — £521 avg spend, 2.7 orders, 31 days recency. Most recently active segment after VIP. Cross-sell and upsell to migrate toward VIP.
+**Promising** (855 customers) — £521 avg spend, 2.7 orders, 31 days recency. Most recently active segment after VIP. Cross-sell and upsell to migrate toward VIP.
 
 **At-Risk High-Value** (1,074 customers) — £1,252 avg spend, 1.5 orders, 338 days recency, highest AOV at £740. They spend big when they buy but are now disengaged. Personalized win-back campaigns before full churn.
 
@@ -77,10 +110,38 @@ GMM was evaluated across all four covariance types (spherical, tied, diag, full)
 
 ---
 
+## Estimated Business Impact
+
+Illustrative win-back revenue potential: customers × industry-benchmark reactivation rate × AOV (value of one recovered order).
+
+| Segment | Customers | AOV | Low | Mid | High |
+|---|---|---|---|---|---|
+| At-Risk High-Value | 1,074 | £740 | £39.7k | £79.5k | £119.2k |
+| At-Risk Frequent | 839 | £207 | £8.7k | £17.4k | £26.1k |
+| Churned | 1,024 | £127 | £2.6k | £4.6k | £6.5k |
+| **Total (mid-case)** | | | | **~£101k** | |
+
+Assumptions: rates are illustrative industry benchmarks, not fitted to this data.
+
+
+Illustrative upsell revenue potential: customers migrating from Promising-level spend (£521) to VIP-core-level spend (£2,461) — a different mechanism than win-back, using more conservative migration rates (3–12%) than typical single-purchase upsell benchmarks (10–25%).
+
+| Segment | Customers | Δ Spend | Low | Mid | High |
+|---|---|---|---|---|---|
+| Promising → VIP | 855 | £1,940 | £49.8k | £116.1k | £199.0k |
+
+*Δ Spend based on VIP core avg spend (£2,461, excluding whale outliers), not the £6,965 blended VIP average shown above.
+
+**Combined estimated impact (mid-case): ~£217k**
+
+---
+
 ## Model Validation
 
-Temporal consistency is verified by splitting the dataset at December 2010 and computing segment distributions independently on each half — no segment shifts by more than 1.6 percentage points. Cluster stability is confirmed via Adjusted Rand Index across four random seeds (ARI ≥ 0.99). Bootstrap stability is confirmed across 100 resampled iterations (mean ARI: 0.857 ± 0.082).  Statistical separation between clusters is confirmed by Kruskal-Wallis tests (p ≈ 0 for all four features). An end-to-end inference demo validates that seven synthetic customers with known profiles each land in the correct segment.
-
+Distributional stability is verified by splitting the dataset at December 2010 and applying the already-trained pipeline to each half independently — segment proportions shift by no more than 1.6 percentage points. 
+Cluster stability is confirmed via Adjusted Rand Index across four random seeds (ARI ≥ 0.99). 
+Bootstrap stability is confirmed across 100 resampled iterations (mean ARI: 0.857 ± 0.082).
+Statistical separation between clusters is confirmed by Kruskal-Wallis tests (p ≈ 0 for all four features). An end-to-end inference demo validates that seven synthetic customers with known profiles each land in the correct segment.
 
 ---
 
@@ -94,6 +155,7 @@ Temporal consistency is verified by splitting the dataset at December 2010 and c
 - `artifacts/iqr_bounds.pkl` — outlier detection bounds
 - `artifacts/reference_date.pkl` — training reference date
 - `artifacts/cluster_labels_names.pkl` — cluster index to segment name mapping
+- `outputs/cluster_summary_normalized.xlsx` — cluster means normalized to 0–100 scale, for cross-feature comparison on one chart
 
 All artifacts enable end-to-end inference on new customers without retraining.
 
@@ -122,10 +184,8 @@ MonetaryValue = AOV × Frequency is an algebraic identity introducing feature re
 
 ## Stack
 
-`pandas` · `numpy` · `scikit-learn` · `seaborn` · `matplotlib` · `scipy` · `pandera` · `joblib`
+`pandas` · `numpy` · `scikit-learn` · `seaborn` · `matplotlib` · `scipy` · `pandera` · `joblib` · `pytest`
 
 ---
 
-**Notes**
-- The purpose of this code is to explicitly demonstrate the reasoning behind every choice balanced between statistics and business interpretability without deleting post-hoc known facts (for example tenure is preserved initally then dropped instead of not being included in the first place)
-- The code includes descriptive markdown cells throughout, and every decision is justified visually, statistically, and from a business perspective.
+The code includes descriptive markdown cells throughout, and every decision is justified visually, statistically, and from a business perspective.
