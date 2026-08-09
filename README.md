@@ -1,6 +1,6 @@
 # Data Science project: Customer Segmentation — Online Retail II
 
-RFM-based customer segmentation using KMeans clustering (benchmarked against GMM) on the UCI Online Retail II dataset (2009–2011, ~1M transactions). Segments ~5,850 customers into five actionable groups with tailored marketing recommendations, a potential revenue opportunity (win-back + upsell), and a baseline comparison confirming clustering outperforms simple RFM quintile scoring — dashboard in Power BI.
+RFM-based customer segmentation using KMeans clustering (benchmarked against GMM) on the UCI Online Retail II dataset (2009–2011, ~1M transactions). Segments ~5,850 customers into five actionable groups with tailored marketing recommendations, a potential revenue opportunity (win-back + upsell), and a baseline comparison confirming clustering outperforms simple RFM quintile scoring. Additionally dashboard in Power BI showing final recommendations and statistics and interactive UI where a user gives examplory data and it segments the output - in streamlit, are presented.
 
 ---
 
@@ -171,6 +171,16 @@ Full version: [dashboard.pdf](dashboard/dashboard.pdf)
 
 ---
 
+## Interactive Demo
+
+Live segment prediction for a single customer, powered by the same `predict_segment()` inference pipeline used in `src/inference.py`.
+
+```bash
+streamlit run streamlit_app.py
+```
+
+---
+
 ## Limitations
 
 Silhouette scores are weak (0.28–0.36), which is expected given that customer behavior is inherently continuous and cluster overlap is unavoidable. 
@@ -184,7 +194,7 @@ MonetaryValue = AOV × Frequency is an algebraic identity introducing feature re
 
 ## Stack
 
-`pandas` · `numpy` · `scikit-learn` · `seaborn` · `matplotlib` · `scipy` · `pandera` · `joblib` · `pytest`
+`pandas` · `numpy` · `scikit-learn` · `seaborn` · `matplotlib` · `scipy` · `pandera` · `joblib` · `pytest` · `streamlit`
 
 ---
 
