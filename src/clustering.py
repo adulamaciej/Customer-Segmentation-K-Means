@@ -37,6 +37,15 @@ def assign_cluster_names(non_outliers_df: pd.DataFrame) -> dict:
     atrisk_freq_cluster = remaining2["Recency"].idxmax()
 
     assigned = [vip_cluster, churned_cluster, atrisk_hv_cluster, atrisk_freq_cluster]
+
+    if len(set(assigned)) != len(assigned):
+        raise ValueError(
+            f"Cluster naming collision: the same cluster id was selected for "
+            f"more than one business label ({assigned}). This means two "
+            f"segments are not well separated on the criteria used for "
+            f"naming. Inspect cluster_means and adjust k or the naming rule."
+        )
+
     promising_cluster = [c for c in cluster_means.index if c not in assigned][0]
 
     return {

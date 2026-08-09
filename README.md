@@ -80,6 +80,12 @@ No single metric unanimously agrees on an optimal k, so the final choice integra
 k=5 is selected. It wins two of three metrics against k=4 (Davies-Bouldin and Silhouette), and k=4 is further ruled out because it merges At-Risk High-Value and At-Risk Frequent into a single segment — two groups that differ critically in AOV (£426 vs £216 on non-outlier training data) and require entirely different marketing strategies. Convergence is confirmed at 14 iterations; max_iter=50 is retained 
 as a safety margin.
 
+GMM was tested as an alternative to KMeans on both raw transformed features 
+(silhouette 0.28, DB 1.00) and PCA-reduced input (silhouette 0.27, DB 1.01) — 
+nearly identical either way, confirming GMM's near-tie with KMeans (silhouette 
+0.301, DB 1.057) holds regardless of feature space. KMeans is retained for its 
+cleaner hard-label output, better suited to the marketing use case.
+
 ---
 
 ## Baseline Comparison
@@ -132,7 +138,10 @@ Illustrative upsell revenue potential: customers migrating from Promising-level 
 
 ## Model Validation
 
-Distributional stability is verified by splitting the dataset at December 2010 and applying the already-trained pipeline to each half independently — segment proportions shift by no more than 1.6 percentage points. Cluster stability is confirmed via Adjusted Rand Index across four random seeds (ARI ≥ 0.99). Statistical separation between clusters is confirmed by Kruskal-Wallis tests (p ≈ 0 for all four features). An end-to-end inference demo validates that seven synthetic customers with known profiles each land in the correct segment.
+Distributional stability is verified by splitting the dataset at December 2010 and applying the already-trained pipeline to each half independently — segment proportions shift by no more than 1.6 percentage points. 
+Cluster stability is confirmed via Adjusted Rand Index across four random seeds (ARI ≥ 0.99). 
+Bootstrap stability is confirmed across 100 resampled iterations (mean ARI: 0.857 ± 0.082).
+Statistical separation between clusters is confirmed by Kruskal-Wallis tests (p ≈ 0 for all four features). An end-to-end inference demo validates that seven synthetic customers with known profiles each land in the correct segment.
 
 ---
 
@@ -145,6 +154,8 @@ Distributional stability is verified by splitting the dataset at December 2010 a
 - `artifacts/pca.pkl` — fitted PCA (3 components)
 - `artifacts/iqr_bounds.pkl` — outlier detection bounds
 - `artifacts/reference_date.pkl` — training reference date
+- `artifacts/cluster_labels_names.pkl` — cluster index to segment name mapping
+- `outputs/cluster_summary_normalized.xlsx` — cluster means normalized to 0–100 scale, for cross-feature comparison on one chart
 
 All artifacts enable end-to-end inference on new customers without retraining.
 
@@ -173,7 +184,7 @@ MonetaryValue = AOV × Frequency is an algebraic identity introducing feature re
 
 ## Stack
 
-`pandas` · `numpy` · `scikit-learn` · `seaborn` · `matplotlib` · `scipy` · `pandera` · `joblib`, `pytest`
+`pandas` · `numpy` · `scikit-learn` · `seaborn` · `matplotlib` · `scipy` · `pandera` · `joblib` · `pytest`
 
 ---
 
